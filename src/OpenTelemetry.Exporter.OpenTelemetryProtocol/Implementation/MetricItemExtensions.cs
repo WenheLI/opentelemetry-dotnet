@@ -69,6 +69,18 @@ namespace OpenTelemetry.Exporter.OpenTelemetryProtocol.Implementation
                     resourceMetrics.ScopeMetrics.Add(scopeMetrics);
                 }
 
+                scopeMetrics.IsSli = metric.IsSLI;
+                if (scopeMetrics.SliDetail.Count == 0)
+                {
+                    foreach (var kv in metric.SLIDetails)
+                    {
+                        KeyValuePair<string, object> temp = new(kv.Key, kv.Value);
+                        if (OtlpKeyValueTransformer.Instance.TryTransformTag(temp, out var result))
+                        {
+                            scopeMetrics.SliDetail.Add(result);
+                        }
+                    }
+                }
                 scopeMetrics.Metrics.Add(otlpMetric);
             }
         }

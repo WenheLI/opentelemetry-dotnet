@@ -43,6 +43,24 @@ namespace OpenTelemetry.Metrics
         }
 
         /// <summary>
+        /// Adds a meter to the provider.
+        /// </summary>
+        /// <param name="meterProviderBuilder"><see cref="MeterProviderBuilder"/>.</param>
+        /// <param name="name"><see cref="MetricReader"/>.</param>
+        /// <param name="sliDef"><see cref="MetricSLI"/>.</param>
+        /// <returns><see cref="MeterProvider"/>.</returns>
+        public static MeterProviderBuilder AddMeter(this MeterProviderBuilder meterProviderBuilder, string name, MetricSLI sliDef)
+        {
+            if (meterProviderBuilder is MeterProviderBuilderBase meterProviderBuilderBase)
+            {
+                meterProviderBuilderBase.MetricSLIRecords.Add(name, sliDef);
+                return meterProviderBuilderBase.AddMeter(name);
+            }
+
+            return meterProviderBuilder;
+        }
+
+        /// <summary>
         /// Add metric view, which can be used to customize the Metrics outputted
         /// from the SDK. The views are applied in the order they are added.
         /// </summary>

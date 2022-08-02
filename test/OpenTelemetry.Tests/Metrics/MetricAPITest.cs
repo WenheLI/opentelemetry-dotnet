@@ -76,6 +76,28 @@ namespace OpenTelemetry.Metrics.Tests
         }
 
         [Fact]
+        public void AddMeterWithSLITest()
+        {
+            using var meter = new Meter(Utils.GetCurrentMethodName());
+            var exportedItems = new List<Metric>();
+            var sliDetails = new Dictionary<string, string> { { "Key", "Value" } };
+            var metricSLI = new MetricSLI(true, sliDetails);
+            using var meterProvider = Sdk.CreateMeterProviderBuilder()
+                .AddMeter(meter.Name, metricSLI)
+                .AddInMemoryExporter(exportedItems)
+                .Build();
+
+            var measurement = new Measurement<int>(100, new("name", "apple"), new("color", "red"));
+            meter.CreateObservableGauge("myGauge", () => measurement);
+
+            meterProvider.ForceFlush(MaxTimeToAllowForFlush);
+            Assert.Single(exportedItems);
+            var metric = exportedItems[0];
+            Assert.True(metric.IsSLI);
+            Assert.Equal(sliDetails, metric.SLIDetails);
+        }
+
+        [Fact]
         public void ObserverCallbackTest()
         {
             using var meter = new Meter(Utils.GetCurrentMethodName());

@@ -30,6 +30,7 @@ namespace OpenTelemetry.Metrics
         internal int ShutdownCount;
         private readonly List<object> instrumentations = new();
         private readonly List<Func<Instrument, MetricStreamConfiguration>> viewConfigs;
+        private readonly Dictionary<string, MetricSLI> metricSLIRecords = new();
         private readonly object collectLock = new();
         private readonly MeterListener listener;
         private readonly MetricReader reader;
@@ -43,7 +44,8 @@ namespace OpenTelemetry.Metrics
             List<Func<Instrument, MetricStreamConfiguration>> viewConfigs,
             int maxMetricStreams,
             int maxMetricPointsPerMetricStream,
-            IEnumerable<MetricReader> readers)
+            IEnumerable<MetricReader> readers,
+            Dictionary<string, MetricSLI> sliDefinations = null)
         {
             OpenTelemetrySdkEventSource.Log.MeterProviderSdkEvent("Building MeterProvider.");
 
@@ -52,6 +54,13 @@ namespace OpenTelemetry.Metrics
 
             this.Resource = resource;
             this.viewConfigs = viewConfigs;
+            if (sliDefinations != null)
+            {
+                this.metricSLIRecords = sliDefinations;
+            } else
+            {
+                this.metricSLIRecords = new();
+            }
 
             foreach (var reader in readers)
             {
@@ -209,7 +218,7 @@ namespace OpenTelemetry.Metrics
                         {
                             if (this.compositeMetricReader == null)
                             {
-                                var metrics = this.reader.AddMetricsListWithViews(instrument, metricStreamConfigs);
+                                var metrics = this.reader.AddMetricsListWithViews(instrument, metricStreamConfigs, this.metricSLIRecords);
                                 if (metrics.Count > 0)
                                 {
                                     listener.EnableMeasurementEvents(instrument, metrics);
@@ -217,7 +226,7 @@ namespace OpenTelemetry.Metrics
                             }
                             else
                             {
-                                var metricsSuperList = this.compositeMetricReader.AddMetricsSuperListWithViews(instrument, metricStreamConfigs);
+                                var metricsSuperList = this.compositeMetricReader.AddMetricsSuperListWithViews(instrument, metricStreamConfigs, this.metricSLIRecords);
                                 if (metricsSuperList.Any(metrics => metrics.Count > 0))
                                 {
                                     listener.EnableMeasurementEvents(instrument, metricsSuperList);
@@ -274,7 +283,7 @@ namespace OpenTelemetry.Metrics
                         {
                             if (this.compositeMetricReader == null)
                             {
-                                var metric = this.reader.AddMetricWithNoViews(instrument);
+                                var metric = this.reader.AddMetricWithNoViews(instrument, this.metricSLIRecords);
                                 if (metric != null)
                                 {
                                     listener.EnableMeasurementEvents(instrument, metric);
@@ -282,7 +291,7 @@ namespace OpenTelemetry.Metrics
                             }
                             else
                             {
-                                var metrics = this.compositeMetricReader.AddMetricsWithNoViews(instrument);
+                                var metrics = this.compositeMetricReader.AddMetricsWithNoViews(instrument, this.metricSLIRecords);
                                 if (metrics.Any(metric => metric != null))
                                 {
                                     listener.EnableMeasurementEvents(instrument, metrics);

@@ -32,6 +32,7 @@ namespace OpenTelemetry.Metrics
     {
         internal const int MaxMetricsDefault = 1000;
         internal const int MaxMetricPointsPerMetricDefault = 2000;
+        internal readonly Dictionary<string, MetricSLI> MetricSLIRecords = new();
         private readonly List<InstrumentationFactory> instrumentationFactories = new();
         private readonly List<string> meterSources = new();
         private readonly List<Func<Instrument, MetricStreamConfiguration>> viewConfigs = new();
@@ -149,7 +150,8 @@ namespace OpenTelemetry.Metrics
                 this.viewConfigs,
                 this.maxMetricStreams,
                 this.maxMetricPointsPerMetricStream,
-                this.MetricReaders.ToArray());
+                this.MetricReaders.ToArray(),
+                this.MetricSLIRecords);
         }
 
         internal readonly struct InstrumentationFactory

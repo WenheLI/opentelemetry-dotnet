@@ -26,12 +26,12 @@ namespace OpenTelemetry.Metrics
     /// </summary>
     internal sealed partial class CompositeMetricReader
     {
-        internal List<Metric> AddMetricsWithNoViews(Instrument instrument)
+        internal List<Metric> AddMetricsWithNoViews(Instrument instrument, Dictionary<string, MetricSLI> sliRecords)
         {
             var metrics = new List<Metric>(this.count);
             for (var cur = this.head; cur != null; cur = cur.Next)
             {
-                var metric = cur.Value.AddMetricWithNoViews(instrument);
+                var metric = cur.Value.AddMetricWithNoViews(instrument, sliRecords);
                 metrics.Add(metric);
             }
 
@@ -70,12 +70,12 @@ namespace OpenTelemetry.Metrics
             }
         }
 
-        internal List<List<Metric>> AddMetricsSuperListWithViews(Instrument instrument, List<MetricStreamConfiguration> metricStreamConfigs)
+        internal List<List<Metric>> AddMetricsSuperListWithViews(Instrument instrument, List<MetricStreamConfiguration> metricStreamConfigs, Dictionary<string, MetricSLI> sliRecords)
         {
             var metricsSuperList = new List<List<Metric>>(this.count);
             for (var cur = this.head; cur != null; cur = cur.Next)
             {
-                var metrics = cur.Value.AddMetricsListWithViews(instrument, metricStreamConfigs);
+                var metrics = cur.Value.AddMetricsListWithViews(instrument, metricStreamConfigs, sliRecords);
                 metricsSuperList.Add(metrics);
             }
 
