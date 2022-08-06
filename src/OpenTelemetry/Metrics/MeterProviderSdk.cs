@@ -57,9 +57,6 @@ namespace OpenTelemetry.Metrics
             if (sliDefinations != null)
             {
                 this.metricSLIRecords = sliDefinations;
-            } else
-            {
-                this.metricSLIRecords = new();
             }
 
             foreach (var reader in readers)
