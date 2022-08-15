@@ -29,12 +29,15 @@ namespace OpenTelemetry.Metrics
 
         private readonly AggregatorStore aggStore;
 
+        private readonly MetricSLI metricSLI;
+
         internal Metric(
             MetricStreamIdentity instrumentIdentity,
             AggregationTemporality temporality,
             int maxMetricPointsPerMetricStream,
             double[] histogramBounds = null,
-            string[] tagKeysInteresting = null)
+            string[] tagKeysInteresting = null,
+            MetricSLI incomeSLI = null)
         {
             this.InstrumentIdentity = instrumentIdentity;
 
@@ -108,6 +111,15 @@ namespace OpenTelemetry.Metrics
             this.aggStore = new AggregatorStore(instrumentIdentity.InstrumentName, aggType, temporality, maxMetricPointsPerMetricStream, histogramBounds ?? DefaultHistogramBounds, tagKeysInteresting);
             this.Temporality = temporality;
             this.InstrumentDisposed = false;
+
+            if (incomeSLI != null)
+            {
+                this.metricSLI = incomeSLI;
+            }
+            else
+            {
+                this.metricSLI = MetricSLI.DefaultSLI();
+            }
         }
 
         public MetricType MetricType { get; private set; }
@@ -115,6 +127,10 @@ namespace OpenTelemetry.Metrics
         public AggregationTemporality Temporality { get; private set; }
 
         public string Name => this.InstrumentIdentity.InstrumentName;
+
+        public bool IsSLI => this.metricSLI.IsSLI;
+
+        public Dictionary<string, string> SLIDetails => this.metricSLI.Details;
 
         public string Description => this.InstrumentIdentity.Description;
 

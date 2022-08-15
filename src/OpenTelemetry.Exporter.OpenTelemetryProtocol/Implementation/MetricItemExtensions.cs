@@ -22,6 +22,7 @@ using System.Reflection;
 using System.Reflection.Emit;
 using System.Runtime.CompilerServices;
 using Google.Protobuf.Collections;
+using Opentelemetry.Proto.Common.V1;
 using OpenTelemetry.Metrics;
 using OtlpCollector = Opentelemetry.Proto.Collector.Metrics.V1;
 using OtlpCommon = Opentelemetry.Proto.Common.V1;
@@ -64,11 +65,24 @@ namespace OpenTelemetry.Exporter.OpenTelemetryProtocol.Implementation
                 if (!metricsByLibrary.TryGetValue(meterName, out var scopeMetrics))
                 {
                     scopeMetrics = GetMetricListFromPool(meterName, metric.MeterVersion);
-
                     metricsByLibrary.Add(meterName, scopeMetrics);
                     resourceMetrics.ScopeMetrics.Add(scopeMetrics);
                 }
+                scopeMetrics.IsSli = metric.IsSLI;
+                scopeMetrics.SliDetail.Clear();
 
+                foreach (var kv in metric.SLIDetails)
+                {
+
+                    scopeMetrics.SliDetail.Add(new KeyValue
+                    {
+                        Key = kv.Key,
+                        Value = new AnyValue
+                        {
+                            StringValue = kv.Value
+                        }
+                    });
+                }
                 scopeMetrics.Metrics.Add(otlpMetric);
             }
         }

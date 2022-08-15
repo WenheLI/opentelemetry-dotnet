@@ -11,5 +11,14 @@ OpenTelemetry.Logs.OpenTelemetryLoggerOptions.ConfigureResource(System.Action<Op
 OpenTelemetry.Logs.OpenTelemetryLoggerProvider.ForceFlush(int timeoutMilliseconds = -1) -> bool
 OpenTelemetry.Logs.OpenTelemetryLoggerProvider.OpenTelemetryLoggerProvider() -> void
 OpenTelemetry.Logs.OpenTelemetryLoggerProvider.OpenTelemetryLoggerProvider(System.Action<OpenTelemetry.Logs.OpenTelemetryLoggerOptions!>! configure) -> void
+OpenTelemetry.Metrics.Metric.IsSLI.get -> bool
+OpenTelemetry.Metrics.MetricSLI
+OpenTelemetry.Metrics.MetricSLI.IsSLI -> bool
+~OpenTelemetry.Metrics.MeterProviderBuilderBase.AddMeter(string name, OpenTelemetry.Metrics.MetricSLI sliDef = null) -> OpenTelemetry.Metrics.MeterProviderBuilder
+~OpenTelemetry.Metrics.Metric.SLIDetails.get -> System.Collections.Generic.Dictionary<string, string>
+~OpenTelemetry.Metrics.MetricSLI.Details -> System.Collections.Generic.Dictionary<string, string>
+~OpenTelemetry.Metrics.MetricSLI.MetricSLI(bool isSLI, System.Collections.Generic.Dictionary<string, string> details) -> void
+~static OpenTelemetry.Metrics.MeterProviderBuilderExtensions.AddMeter(this OpenTelemetry.Metrics.MeterProviderBuilder meterProviderBuilder, string name, OpenTelemetry.Metrics.MetricSLI sliDef) -> OpenTelemetry.Metrics.MeterProviderBuilder
 ~static OpenTelemetry.Metrics.MeterProviderBuilderExtensions.ConfigureResource(this OpenTelemetry.Metrics.MeterProviderBuilder meterProviderBuilder, System.Action<OpenTelemetry.Resources.ResourceBuilder> configure) -> OpenTelemetry.Metrics.MeterProviderBuilder
+~static OpenTelemetry.Metrics.MetricSLI.DefaultSLI() -> OpenTelemetry.Metrics.MetricSLI
 ~static OpenTelemetry.Trace.TracerProviderBuilderExtensions.ConfigureResource(this OpenTelemetry.Trace.TracerProviderBuilder tracerProviderBuilder, System.Action<OpenTelemetry.Resources.ResourceBuilder> configure) -> OpenTelemetry.Trace.TracerProviderBuilder

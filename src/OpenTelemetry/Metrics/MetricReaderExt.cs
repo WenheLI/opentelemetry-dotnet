@@ -41,7 +41,7 @@ namespace OpenTelemetry.Metrics
             return this.temporalityFunc(instrumentType);
         }
 
-        internal Metric AddMetricWithNoViews(Instrument instrument)
+        internal Metric AddMetricWithNoViews(Instrument instrument, Dictionary<string, MetricSLI> sliRecords)
         {
             var metricStreamIdentity = new MetricStreamIdentity(instrument, metricStreamConfiguration: null);
             lock (this.instrumentCreationLock)
@@ -71,7 +71,9 @@ namespace OpenTelemetry.Metrics
                     Metric metric = null;
                     try
                     {
-                        metric = new Metric(metricStreamIdentity, this.GetAggregationTemporality(metricStreamIdentity.InstrumentType), this.maxMetricPointsPerMetricStream);
+                        var metricName = metricStreamIdentity.MeterName;
+                        MetricSLI sliDef = sliRecords.ContainsKey(metricName) ? sliRecords[metricName] : null;
+                        metric = new Metric(metricStreamIdentity, this.GetAggregationTemporality(metricStreamIdentity.InstrumentType), this.maxMetricPointsPerMetricStream, incomeSLI: sliDef);
                     }
                     catch (NotSupportedException nse)
                     {
@@ -101,7 +103,7 @@ namespace OpenTelemetry.Metrics
             metric.UpdateDouble(value, tags);
         }
 
-        internal List<Metric> AddMetricsListWithViews(Instrument instrument, List<MetricStreamConfiguration> metricStreamConfigs)
+        internal List<Metric> AddMetricsListWithViews(Instrument instrument, List<MetricStreamConfiguration> metricStreamConfigs, Dictionary<string, MetricSLI> sliRecords)
         {
             var maxCountMetricsToBeCreated = metricStreamConfigs.Count;
 
@@ -157,8 +159,9 @@ namespace OpenTelemetry.Metrics
                     else
                     {
                         Metric metric;
-                        metric = new Metric(metricStreamIdentity, this.GetAggregationTemporality(metricStreamIdentity.InstrumentType), this.maxMetricPointsPerMetricStream, metricStreamIdentity.HistogramBucketBounds, metricStreamIdentity.TagKeys);
-
+                        var metricName = metricStreamIdentity.MeterName;
+                        MetricSLI sliDef = sliRecords.ContainsKey(metricName) ? sliRecords[metricName] : null;
+                        metric = new Metric(metricStreamIdentity, this.GetAggregationTemporality(metricStreamIdentity.InstrumentType), this.maxMetricPointsPerMetricStream, metricStreamIdentity.HistogramBucketBounds, metricStreamIdentity.TagKeys, sliDef);
                         this.instrumentIdentityToMetric[metricStreamIdentity] = metric;
                         this.metrics[index] = metric;
                         metrics.Add(metric);
