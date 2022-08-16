@@ -72,7 +72,9 @@ namespace OpenTelemetry.Metrics
                     try
                     {
                         var metricName = metricStreamIdentity.MeterName;
-                        MetricSLI sliDef = sliRecords.ContainsKey(metricName) ? sliRecords[metricName] : null;
+                        var instructMentName = metricStreamIdentity.InstrumentName;
+                        MetricSLI sliDef = sliRecords.ContainsKey(metricName) ? sliRecords[metricName] :
+                                            sliRecords.ContainsKey(instructMentName) ? sliRecords[instructMentName] : null;
                         metric = new Metric(metricStreamIdentity, this.GetAggregationTemporality(metricStreamIdentity.InstrumentType), this.maxMetricPointsPerMetricStream, incomeSLI: sliDef);
                     }
                     catch (NotSupportedException nse)
@@ -160,7 +162,9 @@ namespace OpenTelemetry.Metrics
                     {
                         Metric metric;
                         var metricName = metricStreamIdentity.MeterName;
-                        MetricSLI sliDef = sliRecords.ContainsKey(metricName) ? sliRecords[metricName] : null;
+                        var instructMentName = metricStreamIdentity.InstrumentName;
+                        MetricSLI sliDef = sliRecords.ContainsKey(metricName) ? sliRecords[metricName] :
+                                            sliRecords.ContainsKey(instructMentName) ? sliRecords[instructMentName] : null;
                         metric = new Metric(metricStreamIdentity, this.GetAggregationTemporality(metricStreamIdentity.InstrumentType), this.maxMetricPointsPerMetricStream, metricStreamIdentity.HistogramBucketBounds, metricStreamIdentity.TagKeys, sliDef);
                         this.instrumentIdentityToMetric[metricStreamIdentity] = metric;
                         this.metrics[index] = metric;
